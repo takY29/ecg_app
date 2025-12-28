@@ -108,11 +108,15 @@ dilat_vg=st.checkbox("Dilatation VG (clinique / écho)")
 dilat_vd=st.checkbox("Dilatation VD (clinique / écho)")
 for d in interpretation_dilatation(dilat_vg,dilat_vd): st.write("•",d)
 
-# Conclusion synthétique avec sources intégrées
+# Conclusion synthétique avec sources visibles
 sources = "- Davignon 1980\n- Rijnbeek 2001\n- Redline 2020\n- Bazett 1920"
-conclusion = f"{analyse_rythme(fc,age)}, {analyse_bav(pr,age)}, {analyse_qrs(qrs,age)}.\n"
-conclusion += f"HVG: {score_hvg(r_v5_s_v1)}, HVD: {score_hvd(r_v1_s_v6,axe_qrs)}.\n"
-conclusion += f"Dilatation: {', '.join(interpretation_dilatation(dilat_vg,dilat_vd))}.\n"
-conclusion += f"QTc Bazett: {qtc_bazett:.0f} ms ({alerte_qtc(qtc_bazett)}).\n"
-conclusion += f"Sources:\n{sources}"
-st.info(conclusion)
+conclusion = f"**Analyse ECG**:\n"
+conclusion += f"- {analyse_rythme(fc,age)}\n"
+conclusion += f"- {analyse_bav(pr,age)}\n"
+conclusion += f"- {analyse_qrs(qrs,age)}\n"
+conclusion += f"- HVG: {score_hvg(r_v5_s_v1)}, HVD: {score_hvd(r_v1_s_v6,axe_qrs)}\n"
+conclusion += f"- Dilatation: {', '.join(interpretation_dilatation(dilat_vg,dilat_vd))}\n"
+conclusion += f"- QTc Bazett: {qtc_bazett:.0f} ms ({alerte_qtc(qtc_bazett)})\n\n"
+conclusion += "**Sources :**\n" + sources
+
+st.markdown(conclusion)
