@@ -39,18 +39,16 @@ def alerte_qtc(qtc):
     else: return "QTc normal"
 
 # ====== HYPERTROPHIE & DILATATION ======
-def score_hvg(r_v5_s_v1):
-    # seuils HVG pédiatrique selon âge ≈ 6 ans
-    if r_v5_s_v1 >= 2.7: return "HVG probable"
-    elif r_v5_s_v1 >= 2.3: return "HVG possible"
+def score_hvg(r_v5_s_v1_mm):
+    # Seuils HVG pédiatriques en mm
+    if r_v5_s_v1_mm >= 27: return "HVG probable"
+    elif r_v5_s_v1_mm >= 23: return "HVG possible"
     else: return "Pas d’argument ECG pour HVG"
 
-def score_hvd(r_v1_s_v6, axe_qrs):
-    score=""
-    if r_v1_s_v6>=2.5 or axe_qrs>120: score="HVD probable"
-    elif r_v1_s_v6>=2.0: score="HVD possible"
-    else: score="Pas d’argument ECG pour HVD"
-    return score
+def score_hvd(r_v1_s_v6_mm, axe_qrs):
+    if r_v1_s_v6_mm >= 25 or axe_qrs > 120: return "HVD probable"
+    elif r_v1_s_v6_mm >= 20: return "HVD possible"
+    else: return "Pas d’argument ECG pour HVD"
 
 def interpretation_dilatation(vg, vd):
     conclusions=[]
@@ -72,10 +70,10 @@ qt=st.number_input("QT (ms)",value=307)
 axe_qrs=st.number_input("Axe QRS (°)",value=62)
 
 # Ondes ventriculaires
-r_v5=st.number_input("R V5 (mV)",value=1.5)
-s_v1=st.number_input("S V1 (mV)",value=1.2)
-r_v1=st.number_input("R V1 (mV)",value=0.8)
-s_v6=st.number_input("S V6 (mV)",value=0.5)
+r_v6=st.number_input("R V6 (mm)",value=17)
+s_v1=st.number_input("S V1 (mm)",value=12)
+r_v1=st.number_input("R V1 (mm)",value=3)
+s_v6=st.number_input("S V6 (mm)",value=2)
 repolarisation=st.checkbox("Anomalies de repolarisation associées")
 
 # Calcul QTc
@@ -100,7 +98,7 @@ for r in conclusions_ecg: st.write("•",r)
 
 # Morphologie ventriculaire
 st.subheader("Morphologie ventriculaire")
-r_v5_s_v1=r_v5+s_v1
+r_v5_s_v1=r_v6+s_v1
 r_v1_s_v6=r_v1+s_v6
 
 st.write("•",score_hvg(r_v5_s_v1))
