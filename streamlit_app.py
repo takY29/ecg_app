@@ -108,19 +108,11 @@ dilat_vg=st.checkbox("Dilatation VG (clinique / écho)")
 dilat_vd=st.checkbox("Dilatation VD (clinique / écho)")
 for d in interpretation_dilatation(dilat_vg,dilat_vd): st.write("•",d)
 
-# Conclusion synthétique
-st.subheader("Conclusion automatique")
+# Conclusion synthétique avec sources
+sources = "Sources: Davignon 1980, Rijnbeek 2001, Redline 2020, Bazett 1920"
 conclusion=f"{analyse_rythme(fc,age)}, {analyse_bav(pr,age)}, {analyse_qrs(qrs,age)}. "
 conclusion+=f"HVG: {score_hvg(r_v5_s_v1)}, HVD: {score_hvd(r_v1_s_v6,axe_qrs)}. "
 conclusion+=f"Dilatation: {', '.join(interpretation_dilatation(dilat_vg,dilat_vd))}. "
-conclusion+=f"QTc Bazett: {qtc_bazett:.0f} ms ({alerte_qtc(qtc_bazett)})."
+conclusion+=f"QTc Bazett: {qtc_bazett:.0f} ms ({alerte_qtc(qtc_bazett)}). "
+conclusion+=sources
 st.info(conclusion)
-
-# ====== SOURCES SCIENTIFIQUES ======
-st.subheader("Sources scientifiques pédiatriques utilisées")
-st.markdown("""
-- Davignon A, et al. *Normal ECG in Children*. Circulation. 1980;62:130-137.  
-- Rijnbeek PR, et al. *Normal values of the pediatric ECG for ages 0–16 years*. Heart. 2001;86:499–505.  
-- Redline RW, et al. *Pediatric Electrocardiography: Clinical Applications and Interpretation*. Springer, 2020.  
-- QTc: Bazett H. *An analysis of the time-relations of electrocardiograms*. Heart. 1920;7:353–370.  
-""")
