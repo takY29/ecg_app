@@ -13,7 +13,7 @@ def normes_ecg_pediatriques(age):
     else:
         return {"FC_min": 60, "FC_max": 100, "PR_max": 180, "QRS_max": 110, "QTc_max": 450}
 
-# ========= ANALYSE DU RYTHME =========
+# ========= ANALYSE ECG =========
 def analyse_rythme(fc, age):
     normes = normes_ecg_pediatriques(age)
     if fc < normes["FC_min"]:
@@ -23,7 +23,6 @@ def analyse_rythme(fc, age):
     else:
         return "Rythme sinusal normal"
 
-# ========= ANALYSE BAV =========
 def analyse_bav(pr, age):
     normes = normes_ecg_pediatriques(age)
     if pr <= normes["PR_max"]:
@@ -31,7 +30,6 @@ def analyse_bav(pr, age):
     else:
         return "Bloc auriculo-ventriculaire du 1er degré (PR allongé pour l’âge)"
 
-# ========= ANALYSE QRS =========
 def analyse_qrs(qrs, age):
     normes = normes_ecg_pediatriques(age)
     if qrs <= normes["QRS_max"]:
@@ -41,7 +39,6 @@ def analyse_qrs(qrs, age):
     else:
         return "Bloc de branche suspect"
 
-# ========= QTc =========
 def interpretation_qtc(qtc):
     if qtc < 440:
         return "QTc normal"
@@ -62,7 +59,6 @@ def alerte_qtc(qtc):
     else:
         return "QTc normal"
 
-# ========= INTERPRÉTATION GLOBALE =========
 def interpretation_ecg(age, fc, pr, qrs, qtc):
     conclusions = []
     conclusions.append(analyse_rythme(fc, age))
@@ -71,7 +67,7 @@ def interpretation_ecg(age, fc, pr, qrs, qtc):
     conclusions.append(interpretation_qtc(qtc))
     return conclusions
 
-# ========= HYPERTROPHIE =========
+# ========= HYPERTROPHIE / DILATATION =========
 def score_hvg(r_v6, s_v1, axe_qrs, repolarisation=False):
     score = 0
     if r_v6 >= 35:
@@ -110,7 +106,6 @@ def interpretation_hvd(score):
     else:
         return "HVD probable – corrélation échographique recommandée"
 
-# ========= DILATATION =========
 def interpretation_dilatation(vg, vd):
     conclusions = []
     if vg:
@@ -128,7 +123,7 @@ st.write("Interprétation ECG pédiatrique automatisée – niveau expert")
 # ----- Paramètres ECG -----
 age = st.number_input("Âge (années)", min_value=0, max_value=18, value=6)
 fc = st.number_input("Fréquence cardiaque (bpm)", value=105)
-pr = st.number_input("PR (ms)", value=72)
+pr = st.number_input("PR (ms)", value=70)
 qrs = st.number_input("QRS (ms)", value=80)
 qt = st.number_input("QT (ms)", value=300)
 axe_qrs = st.number_input("Axe QRS (°)", value=62)
@@ -136,7 +131,6 @@ axe_qrs = st.number_input("Axe QRS (°)", value=62)
 # ----- Calcul QTc -----
 qt_sec = qt / 1000
 rr = 60 / fc
-
 qtc_bazett = qt_sec / (rr ** 0.5) * 1000
 qtc_fridericia = qt_sec / (rr ** (1/3)) * 1000
 
@@ -162,16 +156,16 @@ s_v1 = st.number_input("Onde S en V1 (mm)", value=15)
 r_v1 = st.number_input("Onde R en V1 (mm)", value=10)
 s_v6 = st.number_input("Onde S en V6 (mm)", value=10)
 repolarisation = st.checkbox("Anomalies de repolarisation associées")
-
-hvg_score = score_hvg(r_v6, s_v1, axe_qrs, repolarisation)
-hvd_score = score_hvd(r_v1, s_v6, axe_qrs)
-
-st.write("•", interpretation_hvg(hvg_score))
-st.write("•", interpretation_hvd(hvd_score))
-
 dilat_vg = st.checkbox("Dilatation VG (clinique / écho)")
 dilat_vd = st.checkbox("Dilatation VD (clinique / écho)")
 
+# Calcul automatique HVG / HVD
+hvg_score = score_hvg(r_v6, s_v1, axe_qrs, repolarisation)
+hvd_score = score_hvd(r_v1, s_v6, axe_qrs)
+
+# Affichage HVG/HVD
+st.write("•", interpretation_hvg(hvg_score))
+st.write("•", interpretation_hvd(hvd_score))
 for d in interpretation_dilatation(dilat_vg, dilat_vd):
     st.write("•", d)
 
@@ -181,5 +175,4 @@ conclusion = f"ECG pédiatrique : {analyse_rythme(fc, age)}, {analyse_bav(pr, ag
 conclusion += f"HVG : {interpretation_hvg(hvg_score)}, HVD : {interpretation_hvd(hvd_score)}. "
 conclusion += f"Dilatation VG/VD : {', '.join(interpretation_dilatation(dilat_vg, dilat_vd))}. "
 conclusion += f"QTc Bazett : {qtc_bazett:.0f} ms ({alerte_qtc(qtc_bazett)})."
-
 st.info(conclusion)
